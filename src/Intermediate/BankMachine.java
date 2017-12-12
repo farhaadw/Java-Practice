@@ -15,50 +15,37 @@ public class BankMachine {
     private static boolean accountLocked = false;
     private static double currentBalance = 0;
     private int[] transactions = new int[10];
-
+  
+   
     public static void main(String[] args) {
 
-        enterPin();
-
-        if (accountLocked == true) {
-            System.out.println("We are unable to login you in..");
-            resetPin();
-        }
-
+        // login to account
+        login();
         showMenu();
-
     }
 
-    public static boolean enterPin() {
-
+    public static boolean login() {
         Scanner sc = new Scanner(System.in);
-        System.out.print("Enter password: ");
-        String pass = sc.nextLine();
-        boolean loggedIn = successfulLogin(pass, correctPass);
-
-        while (!pass.equals(correctPass)) {
-            System.out.println("Wrong Password. Enter password again ...");
-            pass = sc.nextLine();
-
-            if (tries == 3) {
-                System.out.println("You are locked out.");
+        boolean loggedIn = false;
+        do {
+            System.out.print("Enter Username: ");
+            String username = sc.nextLine();
+            System.out.print("Enter password: ");
+            String pass = sc.nextLine();
+            loggedIn = successfulLogin(username, pass);
+            if(loggedIn){
+                System.out.println("Welcome " + accountName);
+                tries = 0; 
+            }else{
+                System.out.println("Incorrect username or password. Try again");
+                tries++;
+            }
+            if(tries >= 3){
+                // add functions to reset password 
                 accountLocked = true;
-                break;
             }
-
-            if (successfulLogin(pass, correctPass)) {
-                loggedIn = true;
-                break;
-            }
-
-            tries++;
-        }
-
-        if (loggedIn == true) {
-            System.out.println("Welcome " + accountName);
-
-        }
-
+        }while(!loggedIn);
+    
         return loggedIn;
     }
 
@@ -66,8 +53,8 @@ public class BankMachine {
 
     }
 
-    public static boolean successfulLogin(String pass, String correctPass) {
-        if (pass.equals(correctPass)) {
+    public static boolean successfulLogin(String username, String password) {
+        if(username.equals(accountName) && password.equals(correctPass)){
             return true;
         }
         return false;
@@ -84,10 +71,6 @@ public class BankMachine {
         System.out.println("| [4]  Exit            |");
         System.out.println("========================");
         System.out.println("");
-
-    }
-
-    public static void validateChoice() {
 
     }
 

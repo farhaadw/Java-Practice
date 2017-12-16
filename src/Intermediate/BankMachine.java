@@ -10,22 +10,25 @@ public class BankMachine {
     private static boolean accountLocked = false;
     private static double currentBalance = 100.00;
     private int[] transactions = new int[10];
-  
+           
     static Scanner sc = new Scanner(System.in);
            
     public static void main(String[] args) {
        System.out.println("Welcome to the bank machine!");
        
+       boolean runBank = true;
        login();
        showMenu();
        
-       System.out.print("select an option: ");
-       int choice = sc.nextInt();
-       
-       while(true){
+       while(runBank){
+           System.out.print("select an option: ");
+           int choice = sc.nextInt();
            if(choice == 1){
                System.out.println("Your balance is " + currentBalance);
-               break;
+               if(anotherOption()){
+                   continue;
+               }
+               runBank = false;
            }else if(choice == 2){
                System.out.println("How much do you want to withdraw? ");
                int amount = sc.nextInt();
@@ -35,13 +38,19 @@ public class BankMachine {
                    currentBalance = currentBalance - amount;
                    System.out.println("Your balance is " + currentBalance);
                }
-               break;
+               if(anotherOption()){
+                   continue;
+               }
+               runBank = false;
            }else if(choice == 3){
                System.out.println("You selected 3!");
-               break;
+               if(anotherOption()){
+                   continue;
+               }
+               runBank = false;
            }else if(choice == 4) {
-               System.out.println("Thank you for using bank machine");
-               break;
+               System.out.println("Thank you for using SimpleATM");
+               runBank = false;
            }else{
                System.out.print("Incorrect option. Try again: ");
                choice = sc.nextInt();
@@ -50,13 +59,12 @@ public class BankMachine {
     }
 
     public static boolean login() {
-
         boolean loggedIn = false;
         do {
             System.out.print("Enter Username: ");
-            String username = sc.nextLine();
+            String username = sc.next();
             System.out.print("Enter password: ");
-            String pass = sc.nextLine();
+            String pass = sc.next();
             loggedIn = successfulLogin(username, pass);
             if(loggedIn){
                 System.out.println("Welcome " + accountName);
@@ -66,15 +74,28 @@ public class BankMachine {
                 tries++;
             }
             if(tries == 3){
-                accountLocked = true;
+                 System.out.println("You account is locked! (Reset username or password)");
+                 accountLocked = true;
+                 while(accountLocked){
+                     System.out.println("U for username or P for password");
+                     String reset = sc.next();
+                     if(reset.equalsIgnoreCase("u")){
+                         System.out.print("New username: ");
+                         accountName = sc.next();
+                         accountLocked = false;
+                         tries = 0;
+                     }else if(reset.equalsIgnoreCase("p")){
+                         System.out.print("New password: ");
+                         correctPass = sc.next();
+                         accountLocked = false;
+                         tries = 0; 
+                     }else{
+                         System.out.println("Incorrect option. Try Again");
+                     }
+                 }
             }   
         }while(!loggedIn);
-    
         return loggedIn;
-    }
-
-    public static void resetPin() {
-
     }
 
     public static boolean successfulLogin(String username, String password) {
@@ -83,7 +104,21 @@ public class BankMachine {
         }
         return false;
     }
-
+    
+    public static boolean anotherOption(){
+          System.out.print("Another option? (Y/N) ");
+          String option = sc.next();
+          while((!option.equalsIgnoreCase("y")) && (!option.equalsIgnoreCase("n"))){
+             System.out.print("You must enter Y or N ");
+             option = sc.next();
+          }
+          if(option.equalsIgnoreCase("y")){
+              return true;
+          }
+          System.out.println("Thank you for using SimpleATM");
+          return false;
+    }
+    
     public static void showMenu() {
         System.out.println("\n");
         System.out.println("==== SimpleATM =====");

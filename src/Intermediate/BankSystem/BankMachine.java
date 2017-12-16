@@ -24,12 +24,18 @@ public class BankMachine {
     public static void main(String[] args) {
        System.out.println("Welcome to the SimpleATM!");
        boolean login = true;
-     
+        
+       // test customer 
+       Customer customer = new Customer();
+       customer.setName("farhaad");
+       customer.setPassword("password");
+       customer.setAccount(new Account(customer, null, 100.00));
+       customers.add(customer);
+       
        do{   
          loginOptions();
          System.out.print("Select a login option: ");
          int loginOption = sc.nextInt();
-         
          while(loginOption != 1 && loginOption != 2){
             System.out.print("Select a correct login option: ");
             loginOption = sc.nextInt();
@@ -43,7 +49,7 @@ public class BankMachine {
            showMenu();
          }
          login = false;
-        while(runBank){
+         while(runBank){
            System.out.print("select an option: ");
            int choice = sc.nextInt();
            if(choice == 1){
@@ -85,9 +91,11 @@ public class BankMachine {
             String username = sc.next();
             System.out.print("Enter password: ");
             String pass = sc.next();
-            loggedIn = successfulLogin(username, pass);
-            if(loggedIn){
-                System.out.println("\n Welcome " + accountName);
+            Customer customer = successfulLogin(username, pass);
+            if(!customer.getName().isEmpty()){
+                currentCustomer = customer;
+                System.out.println("\n Welcome " + currentCustomer.getName());
+                loggedIn = true;
                 runBank = true;
                 tries = 0; 
             }else{
@@ -119,18 +127,20 @@ public class BankMachine {
         return loggedIn;
     }
 
-    public static boolean successfulLogin(String username, String password) {
-        if(username.equals(accountName) && password.equals(correctPass)){
-            return true;
+    public static Customer successfulLogin(String username, String password) {
+        for(Customer user : customers){
+           if(user.getName().equals(username) && user.getPassword().equals(password)){
+               return user;
+           }
         }
-        return false;
+        return new Customer();
     }
     
     private static void createAccount() {
-        System.out.println("Create username: ");
-        
-        System.out.println("Create password ");
-       
+       System.out.println("Create username: ");
+       String username = sc.next();;
+       System.out.println("Create password ");
+       String password = sc.next();       
     }
     
     public static void addTransaction(double transaction, Type type){

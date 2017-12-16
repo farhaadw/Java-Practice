@@ -1,9 +1,10 @@
-package Intermediate;
+package Intermediate.BankSystem;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
@@ -15,7 +16,7 @@ public class BankMachine {
     private static int tries = 0;
     private static boolean accountLocked = false;
     private static double currentBalance = 100.00;
-    private static Map<String, Double> transactions = new HashMap<String, Double>();
+    private static List<Transaction> transactions = new ArrayList<Transaction>();
     // keep the bank machine running 
     private static boolean runBank = true;
            
@@ -35,13 +36,14 @@ public class BankMachine {
               anotherOption();
            }else if(choice == 2){
                System.out.println("How much do you want to withdraw? ");
-               int amount = sc.nextInt();
+               double amount = sc.nextDouble();
                if(amount > currentBalance){
-                   System.out.println("You do not have enough money to widthdraw");
+                   System.out.println("You do not have enough funds to widthdraw");
+                   
                }else{
                    currentBalance = currentBalance - amount;
                    System.out.println("Your balance is now " + currentBalance);
-                   addTransaction(amount);;
+                   addTransaction(amount, Type.WITTHDRAW);
                }
                anotherOption();
            }else if(choice == 3){
@@ -104,18 +106,16 @@ public class BankMachine {
         return false;
     }
     
-    public static void addTransaction(double transaction){
+    public static void addTransaction(double transaction, Type type){
         SimpleDateFormat dt1 = new SimpleDateFormat("dd-MM-yyyy");
-        transactions.put(dt1.format(new Date()), transaction);
+        transactions.add(new Transaction(dt1.format(new Date()), transaction, type));
     }
     
     public static void getTransactions(){
-      Set set = transactions.entrySet();
-      Iterator iterator = set.iterator();
-      while(iterator.hasNext()) {
-         Map.Entry value = (Map.Entry)iterator.next();
-         System.out.println("Date: " + value.getKey() + " Withdraw " + value.getValue());
-      }
+        for(Transaction tr : transactions){
+            System.out.println("Date: " + tr.getDate() + " Withdraw " + 
+                    tr.getAmount() + " Type " + tr.getType());
+        }
     }
     
     public static void anotherOption(){

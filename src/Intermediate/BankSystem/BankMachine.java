@@ -3,11 +3,8 @@ package Intermediate.BankSystem;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
-import java.util.Set;
 
 public class BankMachine {
 
@@ -17,18 +14,36 @@ public class BankMachine {
     private static boolean accountLocked = false;
     private static double currentBalance = 100.00;
     private static List<Transaction> transactions = new ArrayList<Transaction>();
+    private static List<Customer> customers = new ArrayList<Customer>();
+    private static Customer currentCustomer;
     // keep the bank machine running 
-    private static boolean runBank = true;
+    private static boolean runBank = false;
            
     static Scanner sc = new Scanner(System.in);
            
     public static void main(String[] args) {
-       System.out.println("Welcome to the bank machine!");
-      
-       login();
-       showMenu();
-       
-       while(runBank){
+       System.out.println("Welcome to the SimpleATM!");
+       boolean login = true;
+     
+       do{   
+         loginOptions();
+         System.out.print("Select a login option: ");
+         int loginOption = sc.nextInt();
+         
+         while(loginOption != 1 && loginOption != 2){
+            System.out.print("Select a correct login option: ");
+            loginOption = sc.nextInt();
+         }
+         if(loginOption == 1){
+           login();
+         }else if(loginOption == 2){
+           createAccount();
+         }
+         if(runBank){
+           showMenu();
+         }
+         login = false;
+        while(runBank){
            System.out.print("select an option: ");
            int choice = sc.nextInt();
            if(choice == 1){
@@ -39,7 +54,6 @@ public class BankMachine {
                double amount = sc.nextDouble();
                if(amount > currentBalance){
                    System.out.println("You do not have enough funds to widthdraw");
-                   
                }else{
                    currentBalance = currentBalance - amount;
                    System.out.println("Your balance is now " + currentBalance);
@@ -50,6 +64,10 @@ public class BankMachine {
                getTransactions();
                anotherOption();
            }else if(choice == 4) {
+               System.out.println("\nThank you for logging in! Hope to see you soon");
+               runBank = false;
+               login = true;
+           }else if(choice == 5){
                System.out.println("Thank you for using SimpleATM");
                runBank = false;
            }else{
@@ -57,6 +75,7 @@ public class BankMachine {
                choice = sc.nextInt();
            }
        }
+     } while(login);
     }
 
     public static boolean login() {
@@ -68,7 +87,8 @@ public class BankMachine {
             String pass = sc.next();
             loggedIn = successfulLogin(username, pass);
             if(loggedIn){
-                System.out.println("Welcome " + accountName);
+                System.out.println("\n Welcome " + accountName);
+                runBank = true;
                 tries = 0; 
             }else{
                 System.out.println("Incorrect username or password. Try again");
@@ -106,17 +126,28 @@ public class BankMachine {
         return false;
     }
     
+    private static void createAccount() {
+        System.out.println("Create username: ");
+        
+        System.out.println("Create password ");
+       
+    }
+    
     public static void addTransaction(double transaction, Type type){
         SimpleDateFormat dt1 = new SimpleDateFormat("dd-MM-yyyy");
         transactions.add(new Transaction(dt1.format(new Date()), transaction, type));
     }
     
     public static void getTransactions(){
-        for(Transaction tr : transactions){
-            System.out.println("Date: " + tr.getDate() + " Withdraw " + 
-                    tr.getAmount() + " Type " + tr.getType());
-        }
-    }
+        if(transactions.isEmpty()){
+            System.out.println("No transactions to display!");
+        }else{ 
+            for(Transaction tr : transactions){
+            System.out.println("Date: " + tr.getDate() + " - Withdraw: " + 
+                    tr.getAmount() + " - Type: " + tr.getType());
+        } 
+     }
+   }
     
     public static void anotherOption(){
           System.out.print("Another option? (Y/N) ");
@@ -141,7 +172,18 @@ public class BankMachine {
         System.out.println("| [1]  Check Balance   |");
         System.out.println("| [2]  Withdrawal      |");
         System.out.println("| [3]  Transactions    |");
-        System.out.println("| [4]  Exit            |");
+        System.out.println("| [4]  Sign out        |");
+        System.out.println("| [5]  Exit            |");
+        System.out.println("========================");
+        System.out.println("");
+    }
+    
+    public static void loginOptions(){
+        System.out.println("");
+        System.out.println("SimpleATM - Login options");
+        System.out.println("========================");
+        System.out.println("| [1]  Sign In          |");
+        System.out.println("| [2]  Create account   |");
         System.out.println("========================");
         System.out.println("");
     }

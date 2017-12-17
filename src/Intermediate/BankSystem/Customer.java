@@ -7,6 +7,7 @@ package Intermediate.BankSystem;
  */
 public class Customer {
     
+    private String customerId = "";
     private String name = "";
     private String password = "";
     private Account account;
@@ -34,5 +35,13 @@ public class Customer {
     public void setAccount(Account account) {
         this.account = account;
     }
-   
+
+    public String getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(String customerId) {
+        this.customerId = customerId;
+    }
+  
 }

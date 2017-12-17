@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
+import java.util.UUID;
 
 public class BankMachine {
 
@@ -25,6 +26,7 @@ public class BankMachine {
        Customer customer = new Customer();
        customer.setName("farhaad");
        customer.setPassword("password");
+       customer.setCustomerId(generateCustomerId("farhaad"));
        customer.setAccount(new Account(customer, new ArrayList<Transaction>(), 100.00));
        customers.add(customer);
        
@@ -68,12 +70,18 @@ public class BankMachine {
                getTransactions();
                anotherOption();
            }else if(choice == 4) {
+               System.out.println("\n## Your profile ##");
+               System.out.println("Id: " + currentCustomer.getCustomerId());
+               System.out.println("Name: " + currentCustomer.getName());
+               System.out.println("\n");
+               anotherOption();   
+           }else if(choice == 5) {
                System.out.println("\nThank you for banking with us " + currentCustomer.getName() + "!"
                        + " Hope to see you soon");
                updateCustomer(currentCustomer);
                runBank = false;
                login = true;
-           }else if(choice == 5){
+           }else if(choice == 6){
                System.out.println("Thank you for using SimpleATM");
                runBank = false;
            }else{
@@ -163,6 +171,7 @@ public class BankMachine {
        Customer customer = new Customer();
        customer.setName(username);
        customer.setPassword(password);
+       customer.setCustomerId(generateCustomerId(username));
        customer.setAccount(new Account(customer, new ArrayList(), 100.00));
        customers.add(customer);
        currentCustomer = customer;
@@ -199,6 +208,10 @@ public class BankMachine {
         }
    }
     
+    public static String generateCustomerId(String username){
+        return username + UUID.randomUUID().toString().substring(0, 6);
+    }
+    
     public static void anotherOption(){
           System.out.print("Another option? (Y/N) ");
           String option = sc.next();
@@ -222,8 +235,9 @@ public class BankMachine {
         System.out.println("| [1]  Check Balance   |");
         System.out.println("| [2]  Withdrawal      |");
         System.out.println("| [3]  Transactions    |");
-        System.out.println("| [4]  Sign out        |");
-        System.out.println("| [5]  Exit            |");
+        System.out.println("| [4]  My Profile         |");
+        System.out.println("| [5]  Sign out        |");
+        System.out.println("| [6]  Exit            |");
         System.out.println("========================");
         System.out.println("");
     }
@@ -241,4 +255,5 @@ public class BankMachine {
     public static void welcomeCustomer(){
         System.out.println("\n### Welcome " + currentCustomer.getName() + " ###");;
     }
+   
 }

@@ -10,5 +10,5 @@ package Intermediate.BankSystem;
  * @author farhaadwasim
  */
 public enum Type {
-    WITTHDRAW, DEPOSIT
+    WITHDRAW, DEPOSIT
 }

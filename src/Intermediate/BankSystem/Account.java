@@ -1,5 +1,6 @@
 package Intermediate.BankSystem;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -9,7 +10,7 @@ import java.util.List;
 public class Account {
     
     private Customer customer;
-    private List<Transaction> transactions;
+    private List<Transaction> transactions = new ArrayList<Transaction>();
     private double balance;
 
     public Account(Customer customer, List<Transaction> transactions, double balance) {
@@ -17,11 +18,7 @@ public class Account {
         this.transactions = transactions;
         this.balance = balance;
     }
-    
-    public Account(){
-        
-    }
-
+  
     public Customer getCustomer() {
         return customer;
     }

@@ -7,8 +7,8 @@ package Intermediate.BankSystem;
  */
 public class Customer {
     
-    private String name;
-    private String password;
+    private String name = "";
+    private String password = "";
     private Account account;
 
     public String getName() {

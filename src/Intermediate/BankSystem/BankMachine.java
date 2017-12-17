@@ -68,7 +68,7 @@ public class BankMachine {
                getTransactions();
                anotherOption();
            }else if(choice == 4) {
-               System.out.println("\nThank you for banking with us + " + currentCustomer.getName() + "!"
+               System.out.println("\nThank you for banking with us " + currentCustomer.getName() + "!"
                        + " Hope to see you soon");
                updateCustomer(currentCustomer);
                runBank = false;
@@ -102,25 +102,7 @@ public class BankMachine {
                 tries++;
             }
             if(tries == 3){
-                 System.out.println("You account is locked! (Reset username or password)");
-                 accountLocked = true;
-                 while(accountLocked){
-                     System.out.println("U for username or P for password");
-                     String reset = sc.next();
-                     if(reset.equalsIgnoreCase("u")){
-                         System.out.print("New username: ");
-                         currentCustomer.setPassword(sc.next());
-                         accountLocked = false;
-                         tries = 0;
-                     }else if(reset.equalsIgnoreCase("p")){
-                         System.out.print("New password: ");
-                         currentCustomer.setPassword(sc.next());
-                         accountLocked = false;
-                         tries = 0; 
-                     }else{
-                         System.out.println("Incorrect option. Try Again");
-                     }
-                 }
+                // add functionality for resetting password
             }   
         }while(!loggedIn);
         return loggedIn;

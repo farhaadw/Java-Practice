@@ -1,12 +1,19 @@
 package Intermediate.BankSystem;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
 
+/*
+ TODO write description text here
+*/
 public class BankMachine {
 
     private static int tries = 0;
@@ -202,12 +209,44 @@ public class BankMachine {
         }else{ 
             System.out.println("\n## Transactions ##");
             for(Transaction tr : transactions){
-            System.out.println("| Date: " + tr.getDate() + " | Withdrawn: " + 
+                System.out.println("| Date: " + tr.getDate() + " | Withdrawn: " + 
                   "£" + tr.getAmount() + " | Type: " + tr.getType());
             } 
         }
    }
     
+    public static void printTransactions(String name){
+        // write transactions to a file 
+        String fileName = name;
+        try{
+            // default encoding 
+            FileWriter fileWriter = new FileWriter(fileName);
+            
+            // wrap in buffered writer
+            BufferedWriter bufferedWriter = 
+                    new BufferedWriter(fileWriter);
+            
+            bufferedWriter.write("Transactions Summary");
+            bufferedWriter.newLine();
+           
+            for(Transaction tr : currentCustomer.getAccount().getTransactions()){
+                bufferedWriter.write("| Date: " + tr.getDate() + " | ");
+                if(tr.getType().equals(Type.WITHDRAW)){
+                  bufferedWriter.write("Withdrawn: " + tr.getAmount() + " | ");   
+                }else if(tr.getType().equals(Type.DEPOSIT)){
+                  bufferedWriter.write("Deposit: " + tr.getAmount() + " | ");
+                }
+                bufferedWriter.write("Type: " + tr.getType() + " | ");
+                bufferedWriter.newLine();
+            }
+            System.out.println("Written to file " + name);
+            bufferedWriter.close();
+        }catch(IOException e){
+            System.out.println(
+                    "Error writing file " + fileName);
+        }
+    }
+      
     public static String generateCustomerId(String username){
         return username + UUID.randomUUID().toString().substring(0, 6);
     }

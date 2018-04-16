@@ -1,0 +1,2 @@
+example text
+hangman text

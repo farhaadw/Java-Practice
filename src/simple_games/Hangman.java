@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.Scanner;
 /**
  *
  * @author farhaad
@@ -37,9 +38,20 @@ public class Hangman {
     static String currentRandomWord = "";
     
     /**
+     * Current random word as asterisks displayed to user
+     */
+    static String currentRandomWordAsterisks = ""; 
+    
+    /**
      *  Path to the Hangman-Words.text file
      */
     static String filePath = "src/simple_games/Hangman-Words.txt";
+    
+    /**
+     *  Variable to keep the game running
+     */
+    static boolean isGameRunning = true;
+        
     
     /**
      * Add words to list on startup
@@ -49,7 +61,7 @@ public class Hangman {
     }
     
     public static void main(String[] args){
-
+        playGame();
     }
 
     /**
@@ -66,7 +78,6 @@ public class Hangman {
         }
         // Shuffle the words in list
         Collections.shuffle(words);
-        System.out.println("Current words in list = " + words);
     }
     
     /**
@@ -74,7 +85,6 @@ public class Hangman {
      */
     public static void readTextFile() throws IOException{
         BufferedReader br = null;
-        System.out.print("Adding words");
         
         try {
             br = new BufferedReader(new FileReader(filePath));
@@ -110,9 +120,11 @@ public class Hangman {
     
     /**
      * Randomly choose a word from list
-     * Return true if word successfully retrieved
+     * Return true if word successfully retrieved,
+     * False if no more words left to display in list
      */
     public static boolean getRandomWord(){
+        currentRandomWord = "";
         words.removeAll(chosenWords);
         Random random = new Random();
         if(words.size() > 0){
@@ -123,11 +135,64 @@ public class Hangman {
         return false;
     }
     
+    /**
+     * Proccess users guess by checking if the word contains the 
+     * charachter
+     */
+    public static String processUsersChoice(String word) {
+         char chosenChar = word.charAt(0);        
+         String displayedWord = "";
+         
+         for(int i = 0; i < currentRandomWord.length(); i++){
+             char currentChar = currentRandomWord.charAt(i);
+             if(currentChar == chosenChar){
+                  currentRandomWordAsterisks += currentChar + " ";
+             }else{
+                 currentRandomWordAsterisks += " _ ";
+             }
+         }
+        
+         displayedWord = currentRandomWordAsterisks;
+         return displayedWord;
+    }
+    
+    /**
+     * 
+     */
     public static void playGame(){
         
-        // Set random word
-        boolean getWord = getRandomWord();
-        
-    }
-         
+        // While the game is still running
+        while(isGameRunning){            
+            Scanner scanner = new Scanner(System.in);
+            // Retrieve random word from list
+            boolean currentWordExists = getRandomWord();
+            // Display initial asterisks
+            if(!currentWordExists){
+                // Exit the game!
+                System.out.println("There is no words left to display!");
+                isGameRunning = false;
+            }else{
+                System.out.print("Word: ");
+                for(int i = 0; i < currentRandomWord.length(); i++){
+                    currentRandomWordAsterisks += " _ "; 
+                }
+                System.out.println(currentRandomWordAsterisks);
+            }
+            // The hanngman word that is displayed to user
+            String wordDisplayed = "";
+            // While there is a word to display
+            while(currentWordExists){
+                // Proccess users request
+                System.out.print("\nPick a word: ");
+                String chosenChar = scanner.next();
+                if(chosenChar.length() > 1 || chosenChar.equals("")){
+                    // TODO FiX
+                    System.out.println("You must specify 1 charachter only, try again: ");
+                    chosenChar = scanner.next();
+                }
+                wordDisplayed =  processUsersChoice(chosenChar);
+                System.out.println(wordDisplayed);
+            }
+        }
+    }    
  }

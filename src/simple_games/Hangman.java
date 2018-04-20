@@ -38,9 +38,9 @@ public class Hangman {
     static String currentRandomWord = "";
     
     /**
-     * Current random word as asterisks displayed to user
+     * Current random word as charachters
      */
-    static String currentRandomWordAsterisks = ""; 
+    static char[] currentRandomWordDisplayed;
     
     /**
      *  Path to the Hangman-Words.text file
@@ -51,6 +51,11 @@ public class Hangman {
      *  Variable to keep the game running
      */
     static boolean isGameRunning = true;
+    
+    /**
+     *  List of possibly words to add to the words list
+     */
+    static String[] wordsList = { "communicated", "absolutely" };
         
     
     /**
@@ -72,9 +77,14 @@ public class Hangman {
             // Read file and to list
             readTextFile();
         } catch (IOException ex) {}
+        
         // Could not read from file, add them programically
         if(words.isEmpty()){
-            addRandomWords();
+           for(String word : wordsList){
+            if(word.length() > 6){
+                words.add(word);   
+            }
+           }   
         }
         // Shuffle the words in list
         Collections.shuffle(words);
@@ -103,33 +113,25 @@ public class Hangman {
              }
         }
     }
-    
-    /**
-     * Add random words to list programmically
-     */
-    public static void addRandomWords(){
-        String[] wordsList = {
-           "communicated", "absolutely"
-        };
-        for(String word : wordsList){
-            if(word.length() > 6){
-                words.add(word);   
-            }
-        }
-    }
-    
+   
     /**
      * Randomly choose a word from list
      * Return true if word successfully retrieved,
      * False if no more words left to display in list
      */
     public static boolean getRandomWord(){
-        currentRandomWord = "";
+        // Remove words that have already been displayed
         words.removeAll(chosenWords);
+        // Pick a random word from the list
         Random random = new Random();
         if(words.size() > 0){
+            // Get random word from list
             currentRandomWord = words.get(random.nextInt(words.size()));
+            // Add to chosen words array
             chosenWords.add(currentRandomWord);
+            // Set the random words to display char
+            currentRandomWordDisplayed = new char[currentRandomWord.length()];
+            // Word has been found
             return true;
         }
         return false;
@@ -140,20 +142,29 @@ public class Hangman {
      * charachter
      */
     public static String processUsersChoice(String word) {
-         char chosenChar = word.charAt(0);        
-         String displayedWord = "";
+         char chosenChar = word.charAt(0);     
+         String displayedLine = "";
          
          for(int i = 0; i < currentRandomWord.length(); i++){
+             // Current charachter in word 
              char currentChar = currentRandomWord.charAt(i);
+             // Current charachter in char array
+             char currentCharDisplayed = currentRandomWordDisplayed[i];
+             
+             // Recreate the display line
              if(currentChar == chosenChar){
-                  currentRandomWordAsterisks += currentChar + " ";
-             }else{
-                 currentRandomWordAsterisks += " _ ";
+                 displayedLine += chosenChar + " ";
+                 currentRandomWordDisplayed[i] = currentChar;
+             }else if(currentCharDisplayed != '*'){
+                 displayedLine += currentCharDisplayed + " ";
+             }else if(Character.isWhitespace(currentChar)){
+                 displayedLine += "  ";                
+             }else {
+                 displayedLine += "_ ";
              }
          }
-        
-         displayedWord = currentRandomWordAsterisks;
-         return displayedWord;
+         
+         return displayedLine;
     }
     
     /**
@@ -166,7 +177,7 @@ public class Hangman {
             Scanner scanner = new Scanner(System.in);
             // Retrieve random word from list
             boolean currentWordExists = getRandomWord();
-            // Display initial asterisks
+            // Display initial underscores
             if(!currentWordExists){
                 // Exit the game!
                 System.out.println("There is no words left to display!");
@@ -174,9 +185,14 @@ public class Hangman {
             }else{
                 System.out.print("Word: ");
                 for(int i = 0; i < currentRandomWord.length(); i++){
-                    currentRandomWordAsterisks += " _ "; 
+                    char cc = currentRandomWord.charAt(i);
+                    if(!Character.isWhitespace(cc)){
+                         System.out.print("_ ");
+                    }else{
+                         System.out.print("  ");
+                    }
+                    currentRandomWordDisplayed[i] = '*';
                 }
-                System.out.println(currentRandomWordAsterisks);
             }
             // The hanngman word that is displayed to user
             String wordDisplayed = "";
@@ -190,7 +206,7 @@ public class Hangman {
                     System.out.println("You must specify 1 charachter only, try again: ");
                     chosenChar = scanner.next();
                 }
-                wordDisplayed =  processUsersChoice(chosenChar);
+                wordDisplayed = processUsersChoice(chosenChar);
                 System.out.println(wordDisplayed);
             }
         }

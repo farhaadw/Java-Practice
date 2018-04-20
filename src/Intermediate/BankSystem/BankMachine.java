@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
@@ -68,8 +67,8 @@ public class BankMachine {
                if(amount > currentBalance){
                    System.out.println("You do not have enough funds to widthdraw");
                }else{
-                   currentBalance = currentBalance - amount;
-                   System.out.println("Your balance is now " + currentBalance);
+                   double updatedBalance = currentBalance - amount;
+                   updateBalance(updatedBalance);
                    addTransaction(amount, Type.WITHDRAW);
                }
                anotherOption();
@@ -77,10 +76,7 @@ public class BankMachine {
                getTransactions();
                anotherOption();
            }else if(choice == 4) {
-               System.out.println("\n## Your profile ##");
-               System.out.println("Id: " + currentCustomer.getCustomerId());
-               System.out.println("Name: " + currentCustomer.getName());
-               System.out.println("\n");
+               displayUserProfile();
                anotherOption();   
            }else if(choice == 5) {
                System.out.println("\nThank you for banking with us " + currentCustomer.getName() + "!"
@@ -196,6 +192,11 @@ public class BankMachine {
         }
     }
     
+    public static void updateBalance(double balance){
+        currentCustomer.getAccount().setBalance(balance);
+        System.out.println("Your balance is now " + balance);
+    }
+    
     public static void addTransaction(double amount, Type type){
         SimpleDateFormat dt1 = new SimpleDateFormat("dd-MM-yyyy");
         Account account = currentCustomer.getAccount();
@@ -293,6 +294,13 @@ public class BankMachine {
     
     public static void welcomeCustomer(){
         System.out.println("\n### Welcome " + currentCustomer.getName() + " ###");;
+    }
+    
+    public static void displayUserProfile(){
+        System.out.println("\n## Your profile ##");
+        System.out.println("Id: " + currentCustomer.getCustomerId());
+        System.out.println("Name: " + currentCustomer.getName());
+        System.out.println("\n");
     }
    
 }

@@ -14,27 +14,29 @@ import java.util.UUID;
  TODO write description text here
 */
 public class BankMachine {
-
-    private static int tries = 0;
-    private static boolean accountLocked = false;
-    private static List<Customer> customers = new ArrayList<Customer>();
-    private static Customer currentCustomer;
-    // keep the bank machine running 
-    private static boolean runBank = false;
+    private static List<Customer> customers = new ArrayList<Customer>(); // List of customers in the system
+    private static Customer currentCustomer; // Current customer that has logged in
+    private static boolean runBank = false;  // Keep the bank machine running 
            
     static Scanner sc = new Scanner(System.in);
            
     public static void main(String[] args) {
        System.out.println("Welcome to the SimpleATM!");
-       boolean login = true;
+       boolean login = false; // Is user current logged in
         
-       // test customer 
+       // Add a test customer - saves from having to create new customer every time
        Customer customer = new Customer();
-       customer.setName("farhaad");
-       customer.setPassword("password");
-       customer.setCustomerId(generateCustomerId("farhaad"));
-       customer.setAccount(new Account(customer, new ArrayList<Transaction>(), 100.00));
-       customers.add(customer);
+       customer.setUuid("123");
+       customer.setFirstName("Farhaad");
+       customer.setLastName("Wasim");
+       customer.setUsername("farhaad");
+       byte[] hash = {0,2};
+       customer.setPinHash(hash);
+       customer.setUuid(generateUuid("farhaad"));
+       List<Account> accounts = new ArrayList<>();
+       accounts.add(new Account(customer));
+       customer.setAccounts(accounts);
+       customers.add(customer); // Add the customer to list of stored customets
        
        do{   
          loginOptions();
@@ -45,15 +47,21 @@ public class BankMachine {
             loginOption = sc.nextInt();
          }
          if(loginOption == 1){
-           login();
+           boolean isCustomerLoggedIn = login();
+           // For now just exit the application if unsuccessful login attempts
+           if(!isCustomerLoggedIn){
+        	   login = false;
+           }else {
+        	   runBank = true; // if success run the bank
+           }
          }else if(loginOption == 2){
            createAccount();
          }
+         login = true;
          welcomeCustomer();
          if(runBank){
            showMenu();
          }
-         login = false;
          while(runBank){
            System.out.print("select an option: ");
            int choice = sc.nextInt();
@@ -95,26 +103,24 @@ public class BankMachine {
      } while(login);
     }
 
+    /** Process for logging the user into the system **/
     public static boolean login() {
         boolean loggedIn = false;
+        int tries = 0;
         do {
             System.out.print("Enter Username: ");
             String username = sc.next();
             System.out.print("Enter password: ");
             String pass = sc.next();
             Customer customer = successfulLogin(username, pass);
-            if(!customer.getName().isEmpty() && !customer.getPassword().isEmpty()){
+            if(customer.isCustomerLoggedIn()){
                 currentCustomer = customer;
+                customer.setTries(0);
                 loggedIn = true;
-                runBank = true;
-                tries = 0; 
             }else{
                 System.out.println("Incorrect username or password. Try again");
-                tries++;
+                customer.setTries(tries++);
             }
-            if(tries == 3){
-                // add functionality for resetting password
-            }   
         }while(!loggedIn);
         return loggedIn;
     }
@@ -191,6 +197,10 @@ public class BankMachine {
             }
         }
     }
+   
+    public static String generateUuid(String username){
+        return username + UUID.randomUUID().toString().substring(0, 6);
+    }
     
     public static void updateBalance(double balance){
         currentCustomer.getAccount().setBalance(balance);
@@ -247,11 +257,7 @@ public class BankMachine {
                     "Error writing file " + fileName);
         }
     }
-      
-    public static String generateCustomerId(String username){
-        return username + UUID.randomUUID().toString().substring(0, 6);
-    }
-    
+          
     public static void anotherOption(){
           System.out.print("Another option? (Y/N) ");
           String option = sc.next();
@@ -303,4 +309,4 @@ public class BankMachine {
         System.out.println("\n");
     }
    
-}
+} 

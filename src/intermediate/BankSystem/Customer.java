@@ -1,5 +1,5 @@
 
-package Intermediate.BankSystem;
+package intermediate.BankSystem;
 
 import java.util.List;
 import java.util.UUID;

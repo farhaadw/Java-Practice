@@ -1,4 +1,4 @@
-package Intermediate.EmailApp;
+package intermediate.EmailApp;
 
 public class EmailApp {
 

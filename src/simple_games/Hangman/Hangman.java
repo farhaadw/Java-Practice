@@ -6,7 +6,7 @@ It must stop when all the letters are guessed.
 It must give them limited tries and stop after they run out.
 It must display letters they have already guessed (either only the incorrect guesses or all guesses).
  */
-package simple_games;
+package simple_games.Hangman;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

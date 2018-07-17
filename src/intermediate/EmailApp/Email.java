@@ -1,4 +1,4 @@
-package Intermediate.EmailApp;
+package intermediate.EmailApp;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;

@@ -1,312 +1,103 @@
 package intermediate.BankSystem;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
-import java.util.UUID;
 
-/*
- TODO write description text here
-*/
+import intermediate.BankSystem.factory.CustomerFactory;
+import intermediate.BankSystem.model.Customer;
+import intermediate.BankSystem.service.ICustomer;
+import intermediate.BankSystem.service.impl.CustomerServiceImpl;
+
+/**
+ * The Console-Based Bank Machine Application
+ * @author farhaadwasim
+ *
+ */
 public class BankMachine {
-    private static List<Customer> customers = new ArrayList<Customer>(); // List of customers in the system
-    private static Customer currentCustomer; // Current customer that has logged in
-    private static boolean runBank = false;  // Keep the bank machine running 
-           
-    static Scanner sc = new Scanner(System.in);
-           
-    public static void main(String[] args) {
-       System.out.println("Welcome to the SimpleATM!");
-       boolean login = false; // Is user current logged in
+	
+	private Map<Integer, String> menuOptions;
+    Scanner scanner;
+    static boolean runningBank = true;
+   
+    public BankMachine(){
+    	scanner = new Scanner(System.in);
+    }
+    
+    public void runBank(){
+   
+    	System.out.println("Welcome to Simple Bank");    
+    	
+    	do {
+    		
+	    	try {
+				Integer loginOption = displayLoginMenu();
+				
+				if(loginOption == 1){
+					
+					
+				}else if(loginOption == 2){
+					
+				}else{
+					System.out.println("Select the correct option");
+				}
+				
+			} catch (Exception e) {
+				System.out.println("Invalid option, try again.");
+			}
+    	
+    	} while(runningBank); 
+    	
+    }
+    
+    
+    
+    public Integer displayMainMenu() throws Exception {
+     	menuOptions = new HashMap<>();
+        menuOptions.put(1, "Check Balance");
+        menuOptions.put(2, "Check Balance");
+        menuOptions.put(3, "Check Balance");
+        menuOptions.put(4, "Check Balance");
+        menuOptions.put(5, "Exit");
+        return promptForOptions(menuOptions);
+    }
+    
+    public Integer displayLoginMenu() throws Exception {
+     	menuOptions = new HashMap<>();
+        menuOptions.put(1, "Login");
+        menuOptions.put(2, "Create Account");
+        return promptForOptions(menuOptions);
+    }
         
-       // Add a test customer - saves from having to create new customer every time
-       Customer customer = new Customer();
-       customer.setUuid("123");
-       customer.setFirstName("Farhaad");
-       customer.setLastName("Wasim");
-       customer.setUsername("farhaad");
-       byte[] hash = {0,2};
-       customer.setPinHash(hash);
-       customer.setUuid(generateUuid("farhaad"));
-       List<Account> accounts = new ArrayList<>();
-       accounts.add(new Account(customer));
-       customer.setAccounts(accounts);
-       customers.add(customer); // Add the customer to list of stored customets
-       
-       do{   
-         loginOptions();
-         System.out.print("Select a login option: ");
-         int loginOption = sc.nextInt();
-         while(loginOption != 1 && loginOption != 2){
-            System.out.print("Select a correct login option: ");
-            loginOption = sc.nextInt();
-         }
-         if(loginOption == 1){
-           boolean isCustomerLoggedIn = login();
-           // For now just exit the application if unsuccessful login attempts
-           if(!isCustomerLoggedIn){
-        	   login = false;
-           }else {
-        	   runBank = true; // if success run the bank
-           }
-         }else if(loginOption == 2){
-           createAccount();
-         }
-         login = true;
-         welcomeCustomer();
-         if(runBank){
-           showMenu();
-         }
-         while(runBank){
-           System.out.print("select an option: ");
-           int choice = sc.nextInt();
-           if(choice == 1){
-              System.out.println("Your balance is " + currentCustomer.getAccount().getBalance());
-              anotherOption();
-           }else if(choice == 2){
-               System.out.println("How much do you want to withdraw? ");
-               double amount = sc.nextDouble();
-               double currentBalance = currentCustomer.getAccount().getBalance();
-               if(amount > currentBalance){
-                   System.out.println("You do not have enough funds to widthdraw");
-               }else{
-                   double updatedBalance = currentBalance - amount;
-                   updateBalance(updatedBalance);
-                   addTransaction(amount, Type.WITHDRAW);
-               }
-               anotherOption();
-           }else if(choice == 3){
-               getTransactions();
-               anotherOption();
-           }else if(choice == 4) {
-               displayUserProfile();
-               anotherOption();   
-           }else if(choice == 5) {
-               System.out.println("\nThank you for banking with us " + currentCustomer.getName() + "!"
-                       + " Hope to see you soon");
-               updateCustomer(currentCustomer);
-               runBank = false;
-               login = true;
-           }else if(choice == 6){
-               System.out.println("Thank you for using SimpleATM");
-               runBank = false;
-           }else{
-               System.out.print("Incorrect option. Try again: ");
-               choice = sc.nextInt();
-           }
-       }
-     } while(login);
-    }
-
-    /** Process for logging the user into the system **/
-    public static boolean login() {
-        boolean loggedIn = false;
-        int tries = 0;
-        do {
-            System.out.print("Enter Username: ");
-            String username = sc.next();
-            System.out.print("Enter password: ");
-            String pass = sc.next();
-            Customer customer = successfulLogin(username, pass);
-            if(customer.isCustomerLoggedIn()){
-                currentCustomer = customer;
-                customer.setTries(0);
-                loggedIn = true;
-            }else{
-                System.out.println("Incorrect username or password. Try again");
-                customer.setTries(tries++);
-            }
-        }while(!loggedIn);
-        return loggedIn;
-    }
-
-    public static Customer successfulLogin(String username, String password) {
-        for(Customer user : customers){
-           if(user.getName().equals(username) && user.getPassword().equals(password)){
-               return user;
-           }
-        }
-        return new Customer();
-    }
-    
-    private static void createAccount() {
-       boolean validateUsername = false;
-       String username = ""; 
-       String password = ""; 
-       while(!validateUsername){
-           System.out.print("Create username: ");
-           username = sc.next();
-           // user regex match()
-           if(!username.isEmpty() &&  
-                   (username.length() >= 3  && username.length() <= 10)){
-               boolean userExists = false;
-               for(Customer customer : customers){
-                   if(customer.getName().equals(username)){
-                       userExists = true;
-                       break;
-                   }
-               }
-               if(userExists){
-                   System.out.println("The username already exists. Please re-enter a username");
-               }else{
-                   validateUsername = true;
-               }
-           }else{
-               System.out.println("Please enter a valid username. "
-                       + " Remember the username should be between 3 to 10 letters");
-           }
-       }
-       boolean validatePassword = false;
-       while(!validatePassword){
-           System.out.print("Create password: ");
-           password = sc.next();
-           if(!password.isEmpty()){
-               // use regex to match()
-              if((password.length() >= 5 && password.length() <= 10)){
-                validatePassword = true;
-              }else{
-                 System.out.println("Please enter a valid password."
-                         + "Remember this must be between 5 and 10 characters");
-              }
-           }else{
-               System.out.println("This password cannot be empty");
-           }
-       }
-       Customer customer = new Customer();
-       customer.setName(username);
-       customer.setPassword(password);
-       customer.setCustomerId(generateCustomerId(username));
-       customer.setAccount(new Account(customer, new ArrayList(), 100.00));
-       customers.add(customer);
-       currentCustomer = customer;
-       runBank = true;
-    }
-    
-    private static void updateCustomer(Customer current){
-        // update the customer array on sign out.
-        // this is to persist the information if customer signs back in
-        // will update to store to a file to persist this information in future
-        for(Customer customer : customers){
-            if(customer.getName().equals(current.getName())){
-                customer = current;
-            }
-        }
-    }
-   
-    public static String generateUuid(String username){
-        return username + UUID.randomUUID().toString().substring(0, 6);
-    }
-    
-    public static void updateBalance(double balance){
-        currentCustomer.getAccount().setBalance(balance);
-        System.out.println("Your balance is now " + balance);
-    }
-    
-    public static void addTransaction(double amount, Type type){
-        SimpleDateFormat dt1 = new SimpleDateFormat("dd-MM-yyyy");
-        Account account = currentCustomer.getAccount();
-        account.getTransactions().add(new Transaction(dt1.format(new Date()), amount, type));
-    }
-    
-    public static void getTransactions(){
-        List<Transaction> transactions = currentCustomer.getAccount().getTransactions();
-        if(transactions.isEmpty()){
-            System.out.println("No transactions to display!");
-        }else{ 
-            System.out.println("\n## Transactions ##");
-            for(Transaction tr : transactions){
-                System.out.println("| Date: " + tr.getDate() + " | Withdrawn: " + 
-                  "£" + tr.getAmount() + " | Type: " + tr.getType());
-            } 
-        }
-   }
-    
-    public static void printTransactions(String name){
-        // write transactions to a file 
-        String fileName = name;
-        try{
-            // default encoding 
-            FileWriter fileWriter = new FileWriter(fileName);
-            
-            // wrap in buffered writer
-            BufferedWriter bufferedWriter = 
-                    new BufferedWriter(fileWriter);
-            
-            bufferedWriter.write("Transactions Summary");
-            bufferedWriter.newLine();
-           
-            for(Transaction tr : currentCustomer.getAccount().getTransactions()){
-                bufferedWriter.write("| Date: " + tr.getDate() + " | ");
-                if(tr.getType().equals(Type.WITHDRAW)){
-                  bufferedWriter.write("Withdrawn: " + tr.getAmount() + " | ");   
-                }else if(tr.getType().equals(Type.DEPOSIT)){
-                  bufferedWriter.write("Deposit: " + tr.getAmount() + " | ");
-                }
-                bufferedWriter.write("Type: " + tr.getType() + " | ");
-                bufferedWriter.newLine();
-            }
-            System.out.println("Written to file " + name);
-            bufferedWriter.close();
-        }catch(IOException e){
-            System.out.println(
-                    "Error writing file " + fileName);
-        }
-    }
-          
-    public static void anotherOption(){
-          System.out.print("Another option? (Y/N) ");
-          String option = sc.next();
-          while((!option.equalsIgnoreCase("y")) && (!option.equalsIgnoreCase("n"))){
-             System.out.print("You must enter Y or N ");
-             option = sc.next();
-          }
-          if(option.equalsIgnoreCase("y")){
-              runBank = true;
-              return;
-          }
-          System.out.println("Thank you for using SimpleATM");
-          runBank = false;
-    }
-    
-    public static void showMenu() {
-        System.out.println("\n");
-        System.out.println("==== SimpleATM =====");
-        System.out.println("");
+    public Integer promptForOptions(Map<Integer, String> options) throws Exception {
         System.out.println("========================");
-        System.out.println("| [1]  Check Balance   |");
-        System.out.println("| [2]  Withdrawal      |");
-        System.out.println("| [3]  Transactions    |");
-        System.out.println("| [4]  My Profile         |");
-        System.out.println("| [5]  Sign out        |");
-        System.out.println("| [6]  Exit            |");
+        for(Map.Entry<Integer, String> option : menuOptions.entrySet()){
+        	System.out.printf("| [%s]  %s%n", option.getKey(), option.getValue());
+        }
         System.out.println("========================");
-        System.out.println("");
+        System.out.print("Select option: ");
+        Integer option =  scanner.nextInt();
+        return option;
     }
     
-    public static void loginOptions(){
-        System.out.println("");
-        System.out.println("SimpleATM - Login options");
-        System.out.println("========================");
-        System.out.println("| [1]  Sign In          |");
-        System.out.println("| [2]  Create account   |");
-        System.out.println("========================");
-        System.out.println("");
+    public Customer login(){
+    	return null;
     }
     
-    public static void welcomeCustomer(){
-        System.out.println("\n### Welcome " + currentCustomer.getName() + " ###");;
+    public Customer createCustomer(){
+    	CustomerFactory customerFactory = new CustomerFactory();
+    	System.out.println("Username: ");
+    	String username = scanner.next();
+    	System.out.println("First Name: ");
+    	String firstName = scanner.next();
+  
+    	Customer customerToCreate = new Customer();
+    	customerToCreate.setUsername(username);
+    	customerToCreate.setFirstName(firstName);
+    	
+    	
+    	Customer createdCustomer = customerFactory.createCustomer(customerToCreate);
+    	return null;
     }
-    
-    public static void displayUserProfile(){
-        System.out.println("\n## Your profile ##");
-        System.out.println("Id: " + currentCustomer.getCustomerId());
-        System.out.println("Name: " + currentCustomer.getName());
-        System.out.println("\n");
-    }
-   
+  
 } 

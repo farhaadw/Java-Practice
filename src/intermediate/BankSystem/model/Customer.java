@@ -1,5 +1,5 @@
 
-package intermediate.BankSystem;
+package intermediate.BankSystem.model;
 
 import java.util.List;
 import java.util.UUID;
@@ -22,6 +22,9 @@ public class Customer {
     /** Users last name **/
     private String lastName;
     
+    /** Email address **/
+    private String emailAddress;
+    
     /** MD5 hash of users pin **/
     private byte pinHash[];
     
@@ -34,13 +37,14 @@ public class Customer {
     /** The branch the user is associated with **/ 
     private Branch bankBranch;
         
-	public Customer(String uuid, String username, String firstName, String lastName, byte[] pinHash,
-			List<Account> accounts, int tries, Branch bankBranch) {
+	public Customer(String uuid, String username, String firstName, String lastName, String emailAddress,
+			byte[] pinHash, List<Account> accounts, int tries, Branch bankBranch) {
 		super();
 		this.uuid = uuid;
 		this.username = username;
 		this.firstName = firstName;
 		this.lastName = lastName;
+		this.emailAddress = emailAddress;
 		this.pinHash = pinHash;
 		this.accounts = accounts;
 		this.tries = tries;
@@ -75,6 +79,13 @@ public class Customer {
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
 	}
+	public String getEmailAddress() {
+		return emailAddress;
+	}
+
+	public void setEmailAddress(String emailAddress) {
+		this.emailAddress = emailAddress;
+	}
 	public byte[] getPinHash() {
 		return pinHash;
 	}
@@ -98,14 +109,5 @@ public class Customer {
 	}
 	public void setTries(int tries) {
 		this.tries = tries;
-	} 
-	
-	public boolean isCustomerLoggedIn(){
-		if(!this.getUuid().isEmpty() && !this.getUsername().isEmpty() 
-				&& this.getTries() < 3 && this.getPinHash() != null){
-			return true;
-		}
-		return false;
-	}
-	
+	} 	
 }

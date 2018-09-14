@@ -1,4 +1,4 @@
-package intermediate.BankSystem;
+package intermediate.BankSystem.model;
 
 import java.util.ArrayList;
 import java.util.Date;

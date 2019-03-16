@@ -9,7 +9,5 @@ public interface IAccount {
 	boolean isAccountActive(String accountId);
 	
 	void withdraw();
-	
-	
 
 }
